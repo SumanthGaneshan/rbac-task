@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/rbac-task/static/css/main.de24e210.css",
+    "main.js": "/rbac-task/static/js/main.59491df0.js",
+    "static/js/453.7f1e027e.chunk.js": "/rbac-task/static/js/453.7f1e027e.chunk.js",
+    "index.html": "/rbac-task/index.html",
+    "main.de24e210.css.map": "/rbac-task/static/css/main.de24e210.css.map",
+    "main.59491df0.js.map": "/rbac-task/static/js/main.59491df0.js.map",
+    "453.7f1e027e.chunk.js.map": "/rbac-task/static/js/453.7f1e027e.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.de24e210.css",
+    "static/js/main.59491df0.js"
+  ]
+}
