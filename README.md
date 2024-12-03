@@ -1,70 +1,92 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# RBAC Dashboard Project
 
-## Available Scripts
+### Dashboard Link [Live Demo](https://sumanthganeshan.github.io/rbac-task)
+#### Credential
+		username - admin@mail.com
+		password - admin123
 
-In the project directory, you can run:
+## Project Overview
 
-### `npm start`
+This is a Role-Based Access Control (RBAC) Dashboard. The application provides a comprehensive user and role management system with dynamic access controls.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Technologies Used
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- React.js
+- Redux Toolkit
+- Tailwind CSS
+- Material UI
 
-### `npm test`
+## Setup Instructions
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Installation Steps
 
-### `npm run build`
+1. Clone the Repository
+```bash
+git clone https://github.com/sumanthganeshan/rbac-task.git
+cd rbac-task
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. Install Dependencies
+```bash
+npm install
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. Start the Application
+```bash
+npm start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Login Credentials
 
-### `npm run eject`
+### Super Admin Access
+- **Username**: admin@mail.com
+- **Password**: admin123
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Note: Alternative admin credentials are available in the usermodel file's initial users
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Core Features
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Authentication
+- Restricted login (only admin/super admin access)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### User Management
+- Add new users
+- Edit user details
+- Change user status (Active/Inactive)
+- Only Super Admin can delete users
 
-## Learn More
+### Role Management
+-    There are three roles: Superadmin, Admin, and User.  
+-   Superadmin and Admin have the ability to assign and modify the roles of others.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Dynamic Permissions
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- Superadmin - add, view, edit delete
+-  Admin - add, view,edit 
+- User - view
 
-### Code Splitting
+### API Simulation
+Custom API simulation implemented using:
+- Promise
+- setTimeout
+- Simulated server-like response
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Additional Features
+- Search functionality
+- Status Filter(Active/Inactive)
+- Pagination
+- User statistics (used recharts)
+	- Donut charts for:
+	  - User status (Active/Inactive)
+	  - Users per role
+- Theme switcher (Light/Dark mode)
 
-### Analyzing the Bundle Size
+## Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- `src/`
+  - `components/`
+  - `features/`
+  - `model/`
+  - `pages/`
+  

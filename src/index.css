@@ -15,3 +15,13 @@ code {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --bg-light: #ffffff;
+  --bg-dark: #1a202c;
+}
+
+.dark {
+  --bg-light: #1a202c;
+  --bg-dark: #ffffff;
+}

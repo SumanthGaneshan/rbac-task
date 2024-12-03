@@ -1,21 +1,38 @@
-// redux/usersSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { User,initialUsers } from '../model/UserModel';
 
 
 export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
-  async () => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          statusCode: 200,
-          data: initialUsers
-        });
-      }, 500);
-    });
+  async ({ page = 1, limit = 15, searchTerm = '',statusFilter = ''}, { getState }) => {
+    const fullUserList = getState().users.allUsers;
+
+    const loggedInUser = getState().auth.user;
+
+    const filteredUsers = fullUserList.filter(
+      user => 
+        user.id !== loggedInUser?.id && 
+        user.role !== 'SUPER_ADMIN' && 
+        (statusFilter ? user.status === statusFilter : true) &&
+        (user.username.toLowerCase().includes(searchTerm.toLowerCase()) || 
+         user.email.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    console.log("search users",filteredUsers)
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+    return {
+      paginatedUsers,
+      total: filteredUsers.length,
+      page,
+      limit,
+    };
   }
 );
+
+
 
 export const addUser = createAsyncThunk(
   'users/addUser',
@@ -51,10 +68,33 @@ export const updateUser = createAsyncThunk(
   }
 );
 
+export const changeUserStatus = createAsyncThunk(
+  'users/changeUserStatus',
+  async ({ userId, newStatus }) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          statusCode: 200,
+          data: { id: userId, status: newStatus }
+        });
+      }, 500);
+    });
+  }
+);
+
 export const deleteUser = createAsyncThunk(
   'users/deleteUser',
-  async (userId) => {
-    return new Promise((resolve) => {
+  async ({ userId, currentUser }, { rejectWithValue }) => {
+    // Permission check
+    console.log("permission check",currentUser);
+    if (!currentUser.permissions.includes('delete')) {
+      return rejectWithValue({
+        message: 'Only Super Admin can perform delete',
+        statusCode: 403
+      });
+    }
+
+    return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve({
           statusCode: 200,
@@ -68,41 +108,97 @@ export const deleteUser = createAsyncThunk(
 const usersSlice = createSlice({
   name: 'users',
   initialState: {
-    users: [],
+    allUsers: initialUsers,
+    users: [], 
     loading: false,
-    error: null
+    error: null,
+    total: initialUsers.length,
   },
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
-      // Fetch Users
+      // fetch users
       .addCase(fetchUsers.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
-        state.users = action.payload.data;
+        state.users = action.payload.paginatedUsers;
+        state.total = action.payload.total;
         state.loading = false;
       })
-      // Add User
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed to fetch users';
+      })
+      // add User
       .addCase(addUser.fulfilled, (state, action) => {
-        state.users.push(action.payload.data);
+        state.allUsers.push(action.payload.data);
+        state.error = null;
       })
-      // Update User
+      .addCase(addUser.rejected, (state, action) => {
+        state.error = action.error.message || 'Failed to add user';
+      })
+      // update user
       .addCase(updateUser.fulfilled, (state, action) => {
-        const index = state.users.findIndex(
-          user => user.id === action.payload.data.id
-        );
-        if (index !== -1) {
-          state.users[index] = action.payload.data;
+        const updatedUser = action.payload.data;
+      
+        const allUsersIndex = state.allUsers.findIndex((user) => user.id === updatedUser.id);
+        if (allUsersIndex !== -1) {
+          state.allUsers[allUsersIndex] = updatedUser;
         }
+      
+        const usersIndex = state.users.findIndex((user) => user.id === updatedUser.id);
+        if (usersIndex !== -1) {
+          state.users[usersIndex] = updatedUser;
+        }
+      
+        state.error = null;
       })
-      // Delete User
+      // change user status
+      .addCase(changeUserStatus.fulfilled, (state, action) => {
+        const { id, status } = action.payload.data;
+        
+        const allUsersIndex = state.allUsers.findIndex(user => user.id === id);
+        if (allUsersIndex !== -1) {
+          state.allUsers[allUsersIndex] = {
+            ...state.allUsers[allUsersIndex],
+            status
+          };
+        }
+        
+        const usersIndex = state.users.findIndex(user => user.id === id);
+        if (usersIndex !== -1) {
+          state.users[usersIndex] = {
+            ...state.users[usersIndex],
+            status
+          };
+        }
+
+      })
+      // delete user
       .addCase(deleteUser.fulfilled, (state, action) => {
-        state.users = state.users.filter(
-          user => user.id !== action.payload.data.id
+
+        state.allUsers = state.allUsers.filter(
+          (user) => user.id !== action.payload.data.id
         );
+      
+        state.users = state.users.filter(
+          (user) => user.id !== action.payload.data.id
+        );
+      
+        state.error = null;
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
+        state.error = action.error.message || 'Failed to delete user';
       });
-  }
+  },
 });
+
+export const { clearError } = usersSlice.actions;
 
 export default usersSlice.reducer;

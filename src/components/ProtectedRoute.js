@@ -1,4 +1,3 @@
-// components/ProtectedRoute.js
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -10,8 +9,7 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // You can add role-based access here
-  if (user.role !== 'SUPER_ADMIN') {
+  if (user.role !== 'SUPER_ADMIN' && user.role !== "ADMIN") {
     return <Navigate to="/unauthorized" replace />;
   }
 

@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addUser } from '../features/userSlice';
+import { toast } from 'react-toastify';
 
 const AddUser = () => {
   const dispatch = useDispatch();
+  const theme = useSelector((state) => state.theme.mode);
+  // const { error } = useSelector((state) => state.users);
+  
   const [userData, setUserData] = useState({
     username: '',
     email: '',
@@ -26,34 +30,44 @@ const AddUser = () => {
     }
     if (!userData.email.trim()) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(userData.email)) {
-      newErrors.email = 'Email is invalid';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      dispatch(addUser(userData));
-      
-      // Reset form
-      setUserData({
-        username: '',
-        email: '',
-        role: 'USER'
-      });
+      try {
+        const result = await dispatch(addUser(userData)).unwrap();
+        
+        toast.success(`${result.data.role} ${result.data.username} added successfully!`, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        
+        setUserData({
+          username: '',
+          email: '',
+          role: 'USER'
+        });
+      } catch (error) {
+
+      }
     }
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6">
-      <h2 className="text-xl font-bold mb-6">Add New User</h2>
+    <div className={`${theme} bg-white dark:bg-gray-900 shadow-md rounded-lg p-0`}>
+      <h2 className="text-xl font-bold mb-6 text-gray-800 dark:text-white">Add New User</h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block mb-2">Username</label>
+          <label className="block mb-2 text-gray-700 dark:text-gray-300">Username</label>
           <input 
             type="text"
             name="username"
@@ -61,7 +75,8 @@ const AddUser = () => {
             onChange={handleInputChange}
             className={`
               w-full p-2 border rounded
-              ${errors.username ? 'border-red-500' : 'border-gray-300'}
+              ${errors.username ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
+              dark:bg-gray-800 dark:text-white
             `}
             placeholder="Enter username"
           />
@@ -71,7 +86,7 @@ const AddUser = () => {
         </div>
 
         <div>
-          <label className="block mb-2">Email</label>
+          <label className="block mb-2 text-gray-700 dark:text-gray-300">Email</label>
           <input 
             type="email"
             name="email"
@@ -79,7 +94,8 @@ const AddUser = () => {
             onChange={handleInputChange}
             className={`
               w-full p-2 border rounded
-              ${errors.email ? 'border-red-500' : 'border-gray-300'}
+              ${errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}
+              dark:bg-gray-800 dark:text-white
             `}
             placeholder="Enter email"
           />
@@ -89,12 +105,12 @@ const AddUser = () => {
         </div>
 
         <div>
-          <label className="block mb-2">Role</label>
+          <label className="block mb-2 text-gray-700 dark:text-gray-300">Role</label>
           <select
             name="role"
             value={userData.role}
             onChange={handleInputChange}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border rounded dark:bg-gray-800 dark:text-white dark:border-gray-600"
           >
             <option value="USER">User</option>
             <option value="ADMIN">Admin</option>
@@ -108,10 +124,11 @@ const AddUser = () => {
               bg-blue-500 text-white 
               px-4 py-2 rounded 
               hover:bg-blue-600 
+              dark:bg-blue-600 dark:hover:bg-blue-700
               transition
             "
           >
-            Add User
+            Add
           </button>
         </div>
       </form>

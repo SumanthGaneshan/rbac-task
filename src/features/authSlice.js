@@ -1,37 +1,50 @@
-// redux/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { initialUsers } from '../model/UserModel';
 
-// Simulated login API call
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async (credentials, { rejectWithValue }) => {
+  async (credentials, { rejectWithValue, getState }) => {
     return new Promise((resolve, reject) => {
+      // simulating api call
       setTimeout(() => {
-        // Mock admin credentials
-        if (
-          credentials.username === 'admin' && 
-          credentials.password === 'admin123'
-        ) {
-          resolve({
-            statusCode: 200,
-            data: {
-              user: {
-                username: 'admin',
-                role: 'SUPER_ADMIN'
-              },
-              token: 'fake-jwt-token'
-            }
-          });
-        } else {
-          reject(rejectWithValue({
-            statusCode: 401,
-            message: 'Invalid credentials'
+
+        const allUsers = getState().users.allUsers;
+        const user = allUsers.find(u => u.email === credentials.username);
+
+        // Check if user exists
+        if (!user) {
+          return reject(rejectWithValue({
+            statusCode: 403,
+            message: 'User not found',
           }));
         }
-      }, 1000); // Simulate network delay
+
+        // Check if user has admin/super_admin role
+        if (user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN') {
+          return reject(rejectWithValue({
+            statusCode: 401,
+            message: 'Only admin or super admin can log in',
+          }));
+        }
+
+        if (credentials.password !== 'admin123') {
+          return reject(rejectWithValue({
+            statusCode: 401,
+            message: 'Invalid password',
+          }));
+        }
+
+        resolve({
+          statusCode: 200,
+          data: {
+            user,
+          },
+        });
+      }, 1000);
     });
   }
 );
+
 
 const authSlice = createSlice({
   name: 'auth',
